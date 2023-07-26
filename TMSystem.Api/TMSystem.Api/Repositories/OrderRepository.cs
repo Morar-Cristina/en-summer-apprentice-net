@@ -28,6 +28,14 @@ namespace TMSystem.Api.Repositories
             return orders;
         }
 
+        public IEnumerable<Order> GetAllSortedByDateAndPrice()
+        {
+            var orders = _dbContext.Orders;
+            var sortedOrders = orders.OrderBy(o => o.OrderedAt).ThenBy(o => o.TotalPrice);
+
+            return sortedOrders;
+        }
+
         public Order GetById(int id)
         {
             var @order = _dbContext.Orders.Where(e => e.OrderId == id).FirstOrDefault();

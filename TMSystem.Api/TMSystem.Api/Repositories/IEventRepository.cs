@@ -7,11 +7,12 @@ namespace TMSystem.Api.Repositories
         IEnumerable<Event> GetAll();
 
         Task<Event> GetById(int id);
+        Event GetByName(string name);
 
         int Add(Event @event);
 
         void Update(Event @event);
 
-        int Delete(int id);
+        void Delete(Event @event);
     }
 }

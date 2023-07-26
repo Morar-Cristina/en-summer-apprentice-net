@@ -18,9 +18,10 @@ namespace TMSystem.Api.Repositories
             throw new NotImplementedException();
         }
 
-        public int Delete(int id)
+        public void Delete(Event @event)
         {
-            throw new NotImplementedException();
+            _dbContext.Remove(@event);
+            _dbContext.SaveChanges();
         }
 
         public IEnumerable<Event> GetAll()
@@ -33,6 +34,13 @@ namespace TMSystem.Api.Repositories
         public async Task<Event> GetById(int id)
         {
             var @event = await _dbContext.Events.Where(e => e.EventId == id).FirstOrDefaultAsync();
+
+            return @event;
+        }
+
+        public Event GetByName(string name)
+        {
+            var @event = _dbContext.Events.Where(e => e.EventName == name).FirstOrDefault();
 
             return @event;
         }

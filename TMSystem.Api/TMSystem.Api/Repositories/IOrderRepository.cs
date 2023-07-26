@@ -5,6 +5,7 @@ namespace TMSystem.Api.Repositories
     public interface IOrderRepository
     {
         IEnumerable<Order> GetAll();
+        IEnumerable<Order> GetAllSortedByDateAndPrice();
 
         Order GetById(int id);
 

@@ -40,28 +40,28 @@ namespace TMSystem.Api.Controllers
             return Ok(dtoEvents);
         }
 
-        /*
-                [HttpGet]
-                public ActionResult<EventDto> GetById(int id)
-                {
-                    var @event = _eventRepository.GetById(id);
 
-                    if (@event == null)
-                    {
-                        return NotFound();
-                    }
+        [HttpGet]
+        public ActionResult<EventDto> GetByName(string name)
+        {
+            var @event = _eventRepository.GetByName(name);
 
-                    var dtoEvent = new EventDto()
-                    {
-                        EventId = @event.EventId,
-                        EventDescription = @event.EventDescription,
-                        EventName = @event.EventName,
-                        EventType = @event.EventType?.EventTypeName ?? string.Empty,
-                        Venue = @event.Venue?.Location ?? string.Empty
-                    };
+            if (@event == null)
+            {
+                return NotFound();
+            }
 
-                    return Ok(dtoEvent);
-                }*/
+            var dtoEvent = new EventDto()
+            {
+                EventId = @event.EventId,
+                EventDescription = @event.EventDescription,
+                EventName = @event.EventName,
+                EventType = @event.EventType?.EventTypeName ?? string.Empty,
+                Venue = @event.Venue?.Location ?? string.Empty
+            };
+
+            return Ok(dtoEvent);
+        }
 
 
         [HttpGet]
@@ -79,5 +79,30 @@ namespace TMSystem.Api.Controllers
             return Ok(eventDto);
         }
 
+        [HttpPatch]
+        public async Task<ActionResult<EventPatchDto>> Patch(EventPatchDto eventPatch)
+        {
+            var eventEntity = await _eventRepository.GetById(eventPatch.EventId);
+            if (eventEntity == null)
+            {
+                return NotFound();
+            }
+            if (!eventPatch.EventName.IsNullOrEmpty()) eventEntity.EventName = eventPatch.EventName;
+            if (!eventPatch.EventDescription.IsNullOrEmpty()) eventEntity.EventDescription = eventPatch.EventDescription;
+            _eventRepository.Update(eventEntity);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var eventEntity = await _eventRepository.GetById(id);
+            if (eventEntity == null)
+            {
+                return NotFound();
+            }
+            _eventRepository.Delete(eventEntity);
+            return NoContent();
+        }
     }
 }

@@ -50,5 +50,21 @@ namespace TMSystem.Api.Controllers
             };
             return Ok(dtoOrder);
         }
+
+
+        [HttpGet]
+        public ActionResult<List<OrderDto>> GetAllSortedByDateAndPrice()
+        {
+            var orders = _orderRepository.GetAllSortedByDateAndPrice();
+
+            var dtoOrders = orders.Select(e => new OrderDto()
+            {
+                OrderId = e.OrderId,
+                OrderedAt = e.OrderedAt,
+                NumberOfTickets = e.NumberOfTickets,
+                TotalPrice = e.TotalPrice
+            });
+            return Ok(dtoOrders);
+        }
     }
 }
