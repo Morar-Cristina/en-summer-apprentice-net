@@ -18,7 +18,7 @@ namespace TMSystem.Api.Repositories
             throw new NotImplementedException();
         }
 
-        public int Delete(long id)
+        public int Delete(int id)
         {
             throw new NotImplementedException();
         }
@@ -30,9 +30,9 @@ namespace TMSystem.Api.Repositories
             return events;
         }
 
-        public Event GetById(long id)
+        public async Task<Event> GetById(int id)
         {
-            var @event = _dbContext.Events.Where(e => e.EventId == id).FirstOrDefault();
+            var @event = await _dbContext.Events.Where(e => e.EventId == id).FirstOrDefaultAsync();
 
             return @event;
         }

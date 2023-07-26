@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TMSystem.Api.Models;
 using TMSystem.Api.Repositories;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,7 +13,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IEventRepository, EventRepository>();
+builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 
+builder.Services.AddTransient<IEventRepository, EventRepository>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
