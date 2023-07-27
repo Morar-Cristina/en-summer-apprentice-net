@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using TMSystem.Api.Models.Dto;
 using TMSystem.Api.Repositories;
+using AutoMapper;
+
 
 namespace TMSystem.Api.Controllers
 {
@@ -10,10 +13,12 @@ namespace TMSystem.Api.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IMapper _mapper;
 
-        public OrderController(IOrderRepository orderRepository)
+        public OrderController(IOrderRepository orderRepository, IMapper mapper)
         {
             _orderRepository = orderRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -30,25 +35,41 @@ namespace TMSystem.Api.Controllers
             });
             return Ok(dtoOrders);
         }
+        /*
+                [HttpGet]
+                public ActionResult<OrderDto> GetById(int id)
+                {
+                    var @order = _orderRepository.GetById(id);
+
+                    if(order == null)
+                    {
+                        return NotFound();
+                    }
+
+                    var dtoOrder = new OrderDto()
+                    {
+                        OrderId = @order.OrderId,
+                        OrderedAt = @order.OrderedAt,
+                        NumberOfTickets = @order.NumberOfTickets,
+                        TotalPrice = @order.TotalPrice
+                    };
+                    return Ok(dtoOrder);
+                }*/
+
 
         [HttpGet]
-        public ActionResult<OrderDto> GetById(int id)
+        public async Task<ActionResult<OrderDto>> GetById(int id)
         {
-            var @order = _orderRepository.GetById(id);
+            var @order = await _orderRepository.GetById(id);
 
-            if(order == null)
+            if (@order == null)
             {
                 return NotFound();
             }
 
-            var dtoOrder = new OrderDto()
-            {
-                OrderId = @order.OrderId,
-                OrderedAt = @order.OrderedAt,
-                NumberOfTickets = @order.NumberOfTickets,
-                TotalPrice = @order.TotalPrice
-            };
-            return Ok(dtoOrder);
+            var orderDto = _mapper.Map<OrderDto>(@order);
+
+            return Ok(orderDto);
         }
 
 
@@ -65,6 +86,34 @@ namespace TMSystem.Api.Controllers
                 TotalPrice = e.TotalPrice
             });
             return Ok(dtoOrders);
+        }
+
+
+        [HttpPatch]
+        public async Task<ActionResult<OrderPatchDto>> Patch(OrderPatchDto orderPatch)
+        {
+            var orderEntity = await _orderRepository.GetById(orderPatch.OrderId);
+            if (orderEntity == null)
+            {
+                return NotFound();
+            }
+            if (orderPatch.TicketCategoryId != 0) orderEntity.TicketCategoryId = orderPatch.TicketCategoryId;
+            if (orderPatch.NumberOfTickets != 0) orderEntity.NumberOfTickets = orderPatch.NumberOfTickets;
+            _orderRepository.Update(orderEntity);
+            return NoContent();
+        }
+
+        
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var orderEntity = await _orderRepository.GetById(id);
+            if (orderEntity == null)
+            {
+                return NotFound();
+            }
+            _orderRepository.Delete(orderEntity);
+            return NoContent();
         }
     }
 }

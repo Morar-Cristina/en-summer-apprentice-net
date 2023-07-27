@@ -7,12 +7,13 @@ namespace TMSystem.Api.Repositories
         IEnumerable<Order> GetAll();
         IEnumerable<Order> GetAllSortedByDateAndPrice();
 
-        Order GetById(int id);
+        Task<Order> GetById(int id);
+        //Order GetById(int id);
 
         int Add(Order @order);
 
-        void Update(Order order);
+        void Update(Order @order);
 
-        int Delete(int id);
+        void Delete(Order @order);
     }
 }

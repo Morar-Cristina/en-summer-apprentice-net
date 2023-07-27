@@ -1,4 +1,7 @@
-﻿using TMSystem.Api.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using TMSystem.Api.Models;
+using TMSystem.Api.Exceptions;
 
 namespace TMSystem.Api.Repositories
 {
@@ -11,15 +14,15 @@ namespace TMSystem.Api.Repositories
             _dbContext = new TmsystemVsContext();
         }
 
-        public int Add(Order order)
+        public async Task<Order> GetById(int id)
         {
-            throw new NotImplementedException();
-        }
+            var @order = await _dbContext.Orders.Where(e => e.OrderId == id).FirstOrDefaultAsync();
+            if (@order == null)
+                throw new EntityNotFoundException(id, nameof(Order));
 
-        public int Delete(int id)
-        {
-            throw new NotImplementedException();
+            return order;
         }
+        
 
         public IEnumerable<Order> GetAll()
         {
@@ -36,18 +39,28 @@ namespace TMSystem.Api.Repositories
             return sortedOrders;
         }
 
-        public Order GetById(int id)
+        /*public Order GetById(int id)
         {
             var @order = _dbContext.Orders.Where(e => e.OrderId == id).FirstOrDefault();
 
             return @order;
-        }
-
-        public void Update(Order @order)
+        }*/
+        public int Add(Order order)
         {
             throw new NotImplementedException();
         }
 
+        public void Delete(Order @order)
+        {
+            _dbContext.Remove(@order);
+            _dbContext.SaveChanges();
+        }
+
+        public void Update(Order @order)
+        {
+            _dbContext.Entry(@order).State = EntityState.Modified;
+            _dbContext.SaveChanges();
+        }
     }
 
     

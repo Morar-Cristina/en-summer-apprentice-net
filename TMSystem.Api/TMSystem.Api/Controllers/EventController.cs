@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TMSystem.Api.Models.Dto;
 using TMSystem.Api.Repositories;
-using TMSystem.Api.Models;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
-
+using Microsoft.Extensions.Logging;
 
 
 namespace TMSystem.Api.Controllers
@@ -16,12 +15,14 @@ namespace TMSystem.Api.Controllers
     {
         private readonly IEventRepository _eventRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
 
-        public EventController(IEventRepository eventRepository, IMapper mapper)
+        public EventController(IEventRepository eventRepository, IMapper mapper, ILogger<EventController> logger)
         {
             _eventRepository = eventRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -40,6 +41,20 @@ namespace TMSystem.Api.Controllers
             return Ok(dtoEvents);
         }
 
+        [HttpGet]
+        public async Task<ActionResult<EventDto>> GetById(int id)
+        {
+            var @event = await _eventRepository.GetById(id);
+
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            var eventDto = _mapper.Map<EventDto>(@event);
+
+            return Ok(eventDto);
+        }
 
         [HttpGet]
         public ActionResult<EventDto> GetByName(string name)
@@ -61,22 +76,6 @@ namespace TMSystem.Api.Controllers
             };
 
             return Ok(dtoEvent);
-        }
-
-
-        [HttpGet]
-        public async Task<ActionResult<EventDto>> GetById(int id)
-        {
-            var @event = await _eventRepository.GetById(id);
-
-            if (@event == null)
-            {
-                return NotFound();
-            }
-
-            var eventDto = _mapper.Map<EventDto>(@event);
-
-            return Ok(eventDto);
         }
 
         [HttpPatch]

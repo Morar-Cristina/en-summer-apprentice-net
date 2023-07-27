@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TMSystem.Api.Models;
+using TMSystem.Api.Exceptions;
 
 namespace TMSystem.Api.Repositories
 {
@@ -11,6 +12,28 @@ namespace TMSystem.Api.Repositories
         public EventRepository()
         {
             _dbContext = new TmsystemVsContext();
+        }
+        public async Task<Event> GetById(int id)
+        {
+            var @event = await _dbContext.Events.Where(e => e.EventId == id).FirstOrDefaultAsync();
+            if (@event == null)
+                throw new EntityNotFoundException(id, nameof(Event));
+
+            return @event;
+        }
+
+        public IEnumerable<Event> GetAll()
+        {
+            var events = _dbContext.Events;
+
+            return events;
+        }
+
+        public Event GetByName(string name)
+        {
+            var @event = _dbContext.Events.Where(e => e.EventName == name).FirstOrDefault();
+
+            return @event;
         }
 
         public int Add(Event @event)
@@ -24,30 +47,10 @@ namespace TMSystem.Api.Repositories
             _dbContext.SaveChanges();
         }
 
-        public IEnumerable<Event> GetAll()
-        {
-            var events = _dbContext.Events;
-
-            return events;
-        }
-
-        public async Task<Event> GetById(int id)
-        {
-            var @event = await _dbContext.Events.Where(e => e.EventId == id).FirstOrDefaultAsync();
-
-            return @event;
-        }
-
-        public Event GetByName(string name)
-        {
-            var @event = _dbContext.Events.Where(e => e.EventName == name).FirstOrDefault();
-
-            return @event;
-        }
-
         public void Update(Event @event)
         {
-            throw new NotImplementedException();
+            _dbContext.Entry(@event).State = EntityState.Modified;
+            _dbContext.SaveChanges();
         }
     }
 }
